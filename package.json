@@ -1,0 +1,32 @@
+{
+  "name": "@flow-build/compose",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "package": "ncc build index.js -o dist",
+    "test": "jest --coverage -i --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flow-build/compose.git"
+  },
+  "author": "fdte-dsd",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/flow-build/compose/issues"
+  },
+  "homepage": "https://github.com/flow-build/compose#readme",
+  "devDependencies": {
+    "jest": "^25.1.0"
+  },
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "@zeit/ncc": "^0.21.1",
+    "app-root-path": "^3.0.0"
+  }
+}

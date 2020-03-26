@@ -9,7 +9,7 @@
   },
   "scripts": {
     "package": "ncc build index.js -o dist",
-    "test": "jest --coverage -i --watch"
+    "test": "jest --coverage -i --passWithNoTests"
   },
   "repository": {
     "type": "git",

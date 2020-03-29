@@ -9,7 +9,8 @@
   },
   "scripts": {
     "package": "ncc build index.js -o dist",
-    "test": "jest --coverage -i --passWithNoTests"
+    "test": "jest --coverage -i --passWithNoTests",
+    "release": "semantic-release"
   },
   "repository": {
     "type": "git",

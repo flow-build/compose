@@ -1,0 +1,29 @@
+{
+  "name": "flowbuild-compose",
+  "version": "1.0.0",
+  "description": "Just try floebuild out",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flow-build/compose.git"
+  },
+  "keywords": [
+    "flowbuild",
+    "docker"
+  ],
+  "author": "FDTE-DSD",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/flow-build/compose/issues"
+  },
+  "homepage": "https://github.com/flow-build/compose#readme",
+  "devDependencies": {
+    "eslint": "8.20.0"
+  },
+  "dependencies": {
+    "dotenv": "16.0.1"
+  }
+}

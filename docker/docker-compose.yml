@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+
+  db:
+    image: postgres:14.2
+    container_name: db
+    restart: always
+    env_file: '.env'
+    ports:
+      - 5432:5432
+
+  flowbuild:
+    image: flowbuild/server:2.3.1
+    container_name: flowbuild
+    restart: on-failure:10
+    env_file: '.env'
+    depends_on: 
+      - db
+      - mqtt
+    ports:
+      - 3001:3001
+    command: bash -c " npm run migrations && npm run seeds && npm run start "
+
+  mqtt:
+    image: hivemq/hivemq4:latest
+    container_name: mqtt
+    ports:
+      - 8080:8080
+      - 1883:1883
+      - 8000:8000
+
+  studio:
+    image: flowbuild/studio:0.1.0-compose
+    container_name: studio
+    ports:
+      - 3000:80

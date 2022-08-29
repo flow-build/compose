@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   db:
-    image: postgres:14.2
+    image: postgres:14.5
     container_name: db
     restart: always
     env_file: '.env'
@@ -11,7 +11,7 @@ services:
       - 5432:5432
 
   flowbuild:
-    image: flowbuild/server:2.4.0
+    image: flowbuild/server:latest
     container_name: flowbuild
     restart: on-failure:10
     env_file: '.env'

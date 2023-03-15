@@ -30,11 +30,10 @@ components:
             restart: always
             environment:
                 POSTGRES_DB: workflow
-            volumes:
-              -
-                name: data-volume
-                mount: /var/lib/postgresql/data
-                subPath: ''
+        volumes:
+            -
+              name: data-volume
+              mount: /var/lib/postgresql/data
     -
         kind: InitContainer
         name: init-db-wait

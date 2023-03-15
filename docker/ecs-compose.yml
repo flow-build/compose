@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  api:
+    image: flowbuild/server:latest
+    container_name: flowbuild
+    environment:
+      - NODE_ENV=docker
+      - KNEX_ENV=test
+      - PORT=3001
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=flowbuild-dev.cmdlmyjni8jj.us-east-1.rds.amazonaws.com
+      - POSTGRES_DB=workflow
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=bo3QVSgeMhWB3v4fPWXV
+      - JWT_KEY=1234
+      - ENGINE_LOG_LEVEL=debug
+      - KOA_LOG_LEVEL=info
+      - ENGINE_HEARTBEAT=true
+      - MAX_STEP_NUMBER=500
+      - MQTT=true
+      - MQTT_HOST=docke-LoadB-KVQ9HSYGAHES-73080c41b4fcbcd1.elb.us-east-1.amazonaws.com
+      - MQTT_PORT=8000
+      - MQTT_PATH=/mqtt
+      - MQTT_PROTOCOL=ws
+      - MAX_CONTENT_LENGTH=123456789
+      - PUBLISH_STATE_EVENTS=true
+      - PUBLISH_ENGINE_LOGS=true
+      - PUBLISH_SERVER_LOGS=true
+    ports:
+      - 3001:3001
+    command: bash -c " npm run start "
+
+  broker:
+    image: hivemq/hivemq4:latest
+    container_name: mqtt
+    ports:
+      - 8080:8080
+      - 1883:1883
+      - 8000:8000
+
+  diagrams:
+    image: flowbuild/diagrams:latest
+    environment:
+      - NODE_ENV=docker
+      - KNEX_ENV=test
+      - PORT=3000
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=flowbuild-dev.cmdlmyjni8jj.us-east-1.rds.amazonaws.com
+      - POSTGRES_DB=diagrams
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=bo3QVSgeMhWB3v4fPWXV
+    container_name: diagrams_app
+    ports:
+      - 3000:3000
+    command: bash -c "npm run start"

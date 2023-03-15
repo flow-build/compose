@@ -1,0 +1,16 @@
+name: Flowbuild API + Postgres
+description: Base template with the flowbuild API server conected to a Postgres database.
+tags: 
+  - nodejs
+  - flowbuild
+  - postgres
+icons: [ 'nodejs', 'koajs', 'postgres' ]
+stack: 
+  packages:
+    - name: Node.js
+      version: '18.12'
+    - name: Koa.js
+      version: '2.14'
+    - name: PostgresSQL
+      version: '14.5'
+discoverable: true

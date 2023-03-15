@@ -1,0 +1,94 @@
+kind: Environment
+name: flowbuild
+type: primary
+environmentVariables:
+    POSTGRES_HOST: db
+    POSTGRES_PASSWORD: replace-me
+    POSTGRES_USER: postgres
+    ENGINE_HEARTBEAT: true
+    ENGINE_LOG_LEVEL: info
+    HTTP_TIMEOUT: '30000'
+    JWT_KEY: '1234'
+    KNEX_ENV: prod
+    KOA_LOG_LEVEL: info
+    MAX_BODY_LENGTH: '123456789'
+    MAX_CONTENT_LENGTH: '123456789'
+    MAX_STEP_NUMBER: '20'
+    MQTT: 'false'
+    NODE_ENV: prod
+    PUBLISH_ENGINE_LOGS: 'false'
+    PUBLISH_SERVER_LOGS: 'false'
+    PUBLISH_STATE_EVENTS: 'false'
+components:
+    -
+        kind: Database
+        name: db
+        dockerCompose:
+            image: 'postgres:14.7-alpine'
+            ports:
+                - '5432:5432'
+            restart: always
+            environment:
+                POSTGRES_DB: workflow
+            volumes:
+              -
+                name: data-volume
+                mount: /var/lib/postgresql/data
+                subPath: ''
+    -
+        kind: InitContainer
+        name: init-db-wait
+        dockerCompose:
+            image: 'ghcr.io/groundnuty/k8s-wait-for:v1.6'
+            command:
+                - service
+                - db
+    -
+        kind: InitContainer
+        name: create-database
+        dockerCompose:
+            image: finbourne/postgres-client
+            environment:
+                PGPASSWORD: '{{ env.vars.POSTGRES_PASSWORD }}'
+            command: |
+                psql -h postgres-db -U postgres -c "CREATE DATABASE workflow"
+    -
+        kind: Application
+        name: flowbuild
+        gitRepo: 'https://github.com/flow-build/workflow-api.git'
+        gitBranch: master
+        gitApplicationPath: /
+        dockerCompose:
+            build:
+                context: ./
+                dockerfile: ./Dockerfile
+            deploy:
+              resources:
+                limits:
+                  memory: 1G
+                reservations:
+                  memory: 1G
+            environment:
+                NEW_RELIC_ENABLED: '0'
+                POSTGRES_DATABASE: workflow
+            ports:
+                - '3000:3000'
+            command: 'bash -c " npm run migrations && npm start"'
+        pod:
+            init_containers:
+                -
+                    from: init-db-wait
+                    name: wait-for-db
+                -
+                    from: create-database
+                    name: create-workflow-db
+        hosts:
+            -
+                hostname: 'flowbuild-{{ env.base_domain }}'
+                path: /
+                servicePort: 3000
+volumes:
+    -
+        name: data-volume
+        size: 1Gi
+        type: disk

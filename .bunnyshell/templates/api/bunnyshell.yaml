@@ -30,10 +30,6 @@ components:
             restart: always
             environment:
                 POSTGRES_DB: workflow
-        volumes:
-            -
-              name: data-volume
-              mount: /var/lib/postgresql/data
     -
         kind: InitContainer
         name: init-db-wait
@@ -86,8 +82,3 @@ components:
                 hostname: 'flowbuild-{{ env.base_domain }}'
                 path: /
                 servicePort: 3000
-volumes:
-    -
-        name: data-volume
-        size: 1Gi
-        type: disk

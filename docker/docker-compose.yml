@@ -1,9 +1,9 @@
-version: '3.7'
+version: '3.9'
 
 services:
 
   db:
-    image: postgres:14.5
+    image: postgres:14.7-alpine
     container_name: db
     restart: always
     env_file: '.env'
@@ -19,7 +19,7 @@ services:
       - db
       - mqtt
     ports:
-      - 3001:3001
+      - 3000:3000
     command: bash -c " npm run migrations && npm run seeds && npm run start "
 
   mqtt:
@@ -35,3 +35,21 @@ services:
     container_name: studio
     ports:
       - 3000:80
+
+  redis:
+    image: redis:7-bullseye
+    container_name: redis_queue
+    restart: always
+    ports: 
+      - 6379:6379
+  
+  timer:
+    image: flowbuild/timer-worker:1.0.0-development.1
+    container_name: timer
+    restart: on-failure:10
+    env_file: '.env'
+    depends_on: 
+      - redis
+    ports:
+      - 3001:3001
+    command: bash -c " npm run migrations && npm run seeds && npm run start "

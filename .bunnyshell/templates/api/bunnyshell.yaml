@@ -2,7 +2,7 @@ kind: Environment
 name: flowbuild
 type: primary
 environmentVariables:
-    POSTGRES_HOST: db
+    POSTGRES_HOST: postgres
     POSTGRES_PASSWORD: replace-me
     POSTGRES_USER: postgres
     ENGINE_HEARTBEAT: true
@@ -19,10 +19,13 @@ environmentVariables:
     PUBLISH_ENGINE_LOGS: 'false'
     PUBLISH_SERVER_LOGS: 'false'
     PUBLISH_STATE_EVENTS: 'false'
+    TIMER_QUEUE: timer
+    TIMER_PORT: 6379
+    TIMER_HOST: redis
 components:
     -
         kind: Database
-        name: db
+        name: postgres
         dockerCompose:
             image: 'postgres:14.7-alpine'
             ports:
@@ -30,23 +33,18 @@ components:
             restart: always
             environment:
                 POSTGRES_DB: workflow
+            labels:
+                app: postgres
     -
-        kind: InitContainer
-        name: init-db-wait
+        kind: Database
+        name: redis
         dockerCompose:
-            image: 'ghcr.io/groundnuty/k8s-wait-for:v1.6'
-            command:
-                - service
-                - db
-    -
-        kind: InitContainer
-        name: create-database
-        dockerCompose:
-            image: finbourne/postgres-client
-            environment:
-                PGPASSWORD: '{{ env.vars.POSTGRES_PASSWORD }}'
-            command: |
-                psql -h postgres-db -U postgres -c "CREATE DATABASE workflow"
+            image: 'redis:7-bullseye'
+            ports:
+                - '6379:6379'
+            restart: always
+            labels:
+                app: redis
     -
         kind: Application
         name: flowbuild
@@ -54,9 +52,7 @@ components:
         gitBranch: master
         gitApplicationPath: /
         dockerCompose:
-            build:
-                context: ./
-                dockerfile: ./Dockerfile
+            image: 'flowbuild/server:2.21.0'
             deploy:
               resources:
                 limits:
@@ -68,17 +64,50 @@ components:
                 POSTGRES_DATABASE: workflow
             ports:
                 - '3000:3000'
-            command: 'bash -c " npm run migrations && npm start"'
-        pod:
-            init_containers:
-                -
-                    from: init-db-wait
-                    name: wait-for-db
-                -
-                    from: create-database
-                    name: create-workflow-db
+            command: 'bash -c " npm run migrations && npm run seeds && npm start"'
+            healthcheck:
+                interval: 1m
+                retries: 3  
+                start_period: 1m
+                test:
+                    - CMD
+                    - curl
+                    - '-f'
+                    - 'http://localhost:3000/healthcheck'
+                timeout: 10s
         hosts:
             -
                 hostname: 'flowbuild-{{ env.base_domain }}'
                 path: /
                 servicePort: 3000
+    -
+        kind: Application
+        name: timer-worker
+        gitRepo: 'https://github.com/flow-build/timer-worker.git'
+        gitBranch: main
+        gitApplicationPath: /
+        dockerCompose:
+            image: 'flowbuild/timer-worker:1.0.0-development.1'
+            deploy:
+              resources:
+                limits:
+                  memory: 1G
+                reservations:
+                  memory: 1G
+            ports:
+                - '3001:3001'
+            healthcheck:
+                interval: 1m
+                retries: 3  
+                start_period: 1m
+                test:
+                    - CMD
+                    - curl
+                    - '-f'
+                    - 'http://localhost:3001/healthcheck'
+                timeout: 10s
+        hosts:
+            -
+                hostname: 'timer-{{ env.base_domain }}'
+                path: /
+                servicePort: 3001

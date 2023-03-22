@@ -5,6 +5,7 @@ environmentVariables:
     POSTGRES_HOST: postgres
     POSTGRES_PASSWORD: replace-me
     POSTGRES_USER: postgres
+    POSTGRES_PORT: 5432
     ENGINE_HEARTBEAT: true
     ENGINE_LOG_LEVEL: info
     HTTP_TIMEOUT: '30000'
@@ -35,6 +36,11 @@ components:
                 POSTGRES_DB: workflow
             labels:
                 app: postgres
+        volumes:
+            -
+                name: data-volume
+                mount: /var/lib/postgresql/data
+                subPath: ''
     -
         kind: Database
         name: redis
@@ -111,3 +117,8 @@ components:
                 hostname: 'timer-{{ env.base_domain }}'
                 path: /
                 servicePort: 3001
+volumes:
+    -
+        name: data-volume
+        size: 1Gi
+        type: disk

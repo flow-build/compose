@@ -23,6 +23,7 @@ environmentVariables:
     TIMER_QUEUE: timer
     TIMER_PORT: 6379
     TIMER_HOST: redis
+    FLOWBUILD_URL: 'https://flowbuild-{{ env.base_domain }}'
 components:
     -
         kind: Database
@@ -93,7 +94,7 @@ components:
         gitBranch: main
         gitApplicationPath: /
         dockerCompose:
-            image: 'flowbuild/timer-worker:1.0.0-development.1'
+            image: 'flowbuild/timer-worker:1.0.0-development.2'
             deploy:
               resources:
                 limits:

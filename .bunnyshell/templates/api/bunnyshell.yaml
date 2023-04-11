@@ -94,7 +94,7 @@ components:
         gitBranch: main
         gitApplicationPath: /
         dockerCompose:
-            image: 'flowbuild/timer-worker:1.0.0-development.2'
+            image: 'flowbuild/timer-worker:1.0.0'
             deploy:
               resources:
                 limits:

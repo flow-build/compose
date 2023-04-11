@@ -102,7 +102,7 @@ components:
                 reservations:
                   memory: 1G
             ports:
-                - '3001:3001'
+                - '3002:3002'
             healthcheck:
                 interval: 1m
                 retries: 3  
@@ -116,6 +116,25 @@ components:
         hosts:
             -
                 hostname: 'timer-{{ env.base_domain }}'
+                path: /
+                servicePort: 3002
+    -
+        kind: Service
+        name: wem
+        gitRepo: 'https://github.com/flow-build/flowbuild-wem.git'
+        gitBranch: master
+        gitApplicationPath: /
+        dockerCompose:
+            image: 'flowbuild/wem:latest'
+            deploy:
+              resources:
+                limits:
+                  memory: 1G
+                reservations:
+                  memory: 1G
+        hosts:
+            -
+                hostname: 'wem-{{ env.base_domain }}'
                 path: /
                 servicePort: 3001
 volumes:

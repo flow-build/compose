@@ -121,22 +121,24 @@ components:
     -
         kind: Service
         name: wem
-        gitRepo: 'https://github.com/flow-build/flowbuild-wem.git'
-        gitBranch: master
-        gitApplicationPath: /
         dockerCompose:
             image: 'flowbuild/wem:latest'
+            environment:
+                BROKER_HOST: ''
+                BROKER_KAFKA_MECHANISM: PLAIN
+                BROKER_KAFKA_SECRET: change-me
+                BROKER_KAFKA_USERNAME: my-user
+                BROKER_PORT: '9092'
+                FLOWBUILD_SERVER_URL: ''
+                REDIS_HOST: ''
+                REDIS_PASSWORD: ''
+                REDIS_PORT: '6379'
             deploy:
               resources:
                 limits:
                   memory: 1G
                 reservations:
                   memory: 1G
-        hosts:
-            -
-                hostname: 'wem-{{ env.base_domain }}'
-                path: /
-                servicePort: 3001
 volumes:
     -
         name: data-volume

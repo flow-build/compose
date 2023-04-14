@@ -2,28 +2,50 @@ kind: Environment
 name: flowbuild
 type: primary
 environmentVariables:
+    ENGINE_HEARTBEAT: true
+    ENGINE_LOG_LEVEL: info
+    FLOWBUILD_URL: 'https://flowbuild-{{ env.base_domain }}'
+    HTTP_TIMEOUT: '30000'
+    JWT_KEY: '1234'
+    KNEX_ENV: prod
+    KAFKA_HOST: ''
+    KAFKA_MECHANISM: PLAIN
+    KAFKA_SECRET: change-me
+    KAFKA_USERNAME: my-user
+    KAFKA_PORT: 9092
+    KOA_LOG_LEVEL: info
+    MAX_BODY_LENGTH: '123456789'
+    MAX_CONTENT_LENGTH: '123456789'
+    MAX_STEP_NUMBER: '250'
+    MQTT: 'false'
+    MQTT_HOST: mqtt
+    MQTT_NAMESPACE: any
+    MQTT_PASSWORD: ''
+    MQTT_PATH: /mqtt
+    MQTT_PORT: 8884
+    MQTT_PROTOCOL: wss
+    MQTT_USERNAME: flowbuild
+    NEW_RELIC_APP_NAME: some
+    NEW_RELIC_APPLICATION_LOGGING_ENABLED: '1'
+    NEW_RELIC_DISTRIBUTED_TRACING_ENABLED: '1'
+    NEW_RELIC_ENABLED: '0'
+    NEW_RELIC_LICENSE_KEY: ''
+    NEW_RELIC_LOG_ENABLED: '1'
+    NEW_RELIC_LOG_LEVEL: trace
+    NEW_RELIC_NO_CONFIG_FILE: '1'
+    NODE_ENV: prod
     POSTGRES_HOST: postgres
     POSTGRES_PASSWORD: replace-me
     POSTGRES_USER: postgres
     POSTGRES_PORT: 5432
-    ENGINE_HEARTBEAT: true
-    ENGINE_LOG_LEVEL: info
-    HTTP_TIMEOUT: '30000'
-    JWT_KEY: '1234'
-    KNEX_ENV: prod
-    KOA_LOG_LEVEL: info
-    MAX_BODY_LENGTH: '123456789'
-    MAX_CONTENT_LENGTH: '123456789'
-    MAX_STEP_NUMBER: '20'
-    MQTT: 'false'
-    NODE_ENV: prod
     PUBLISH_ENGINE_LOGS: 'false'
     PUBLISH_SERVER_LOGS: 'false'
     PUBLISH_STATE_EVENTS: 'false'
+    REDIS_HOST: redis
+    REDIS_PASSWORD: ''
+    REDIS_PORT: 6379
+    TIMER_BATCH: 0
     TIMER_QUEUE: timer
-    TIMER_PORT: 6379
-    TIMER_HOST: redis
-    FLOWBUILD_URL: 'https://flowbuild-{{ env.base_domain }}'
 components:
     -
         kind: Database
@@ -67,7 +89,6 @@ components:
                 reservations:
                   memory: 1G
             environment:
-                NEW_RELIC_ENABLED: '0'
                 POSTGRES_DATABASE: workflow
             ports:
                 - '3000:3000'
@@ -101,6 +122,13 @@ components:
                   memory: 1G
                 reservations:
                   memory: 1G
+            environment:
+                TIMER_QUEUE: timer
+                TIMER_PORT: '{{ env.vars.REDIS_PORT }}'
+                TIMER_HOST: '{{ env.vars.REDIS_HOST }}'
+                TIMER_WORKER_ACTOR_ID: bea79946-bb82-45a9-a446-c9635ad88f0e
+                FLOWBUILD_URL: '{{ env.vars.FLOWBUILD_URL }}'
+                LOG_LEVEL: info
             ports:
                 - '3002:3002'
             healthcheck:
@@ -124,15 +152,15 @@ components:
         dockerCompose:
             image: 'flowbuild/wem:latest'
             environment:
-                BROKER_HOST: ''
-                BROKER_KAFKA_MECHANISM: PLAIN
-                BROKER_KAFKA_SECRET: change-me
-                BROKER_KAFKA_USERNAME: my-user
-                BROKER_PORT: '9092'
-                FLOWBUILD_SERVER_URL: ''
-                REDIS_HOST: ''
-                REDIS_PASSWORD: ''
-                REDIS_PORT: '6379'
+                BROKER_HOST: '{{ env.vars.KAFKA_HOST }}'
+                BROKER_KAFKA_MECHANISM: '{{ env.vars.KAFKA_MECHANISM }}'
+                BROKER_KAFKA_SECRET: '{{ env.vars.KAFKA_SECRET }}'
+                BROKER_KAFKA_USERNAME: '{{ env.vars.KAFKA_USERNAME }}'
+                BROKER_PORT: '{{ env.vars.KAFKA_PORT }}'
+                FLOWBUILD_SERVER_URL: '{{ env.vars.FLOWBUILD_URL }}'
+                REDIS_HOST: '{{ env.vars.REDIS_HOST }}'
+                REDIS_PASSWORD: '{{ env.vars.REDIS_HOST }}'
+                REDIS_PORT: '{{ env.vars.REDIS_PORT }}'
             deploy:
               resources:
                 limits:

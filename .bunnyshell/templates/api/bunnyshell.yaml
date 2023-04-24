@@ -85,9 +85,7 @@ components:
             deploy:
               resources:
                 limits:
-                  memory: 1G
-                reservations:
-                  memory: 1G
+                  memory: 512M
             environment:
                 POSTGRES_DATABASE: workflow
             ports:
@@ -119,9 +117,7 @@ components:
             deploy:
               resources:
                 limits:
-                  memory: 1G
-                reservations:
-                  memory: 1G
+                  memory: 512M
             environment:
                 TIMER_QUEUE: timer
                 TIMER_PORT: '{{ env.vars.REDIS_PORT }}'
@@ -139,7 +135,7 @@ components:
                     - CMD
                     - curl
                     - '-f'
-                    - 'http://localhost:3001/healthcheck'
+                    - 'http://localhost:3002/healthcheck'
                 timeout: 10s
         hosts:
             -
@@ -164,9 +160,7 @@ components:
             deploy:
               resources:
                 limits:
-                  memory: 1G
-                reservations:
-                  memory: 1G
+                  memory: 512M
 volumes:
     -
         name: data-volume

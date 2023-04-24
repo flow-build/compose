@@ -1,4 +1,4 @@
-name: Flowbuild API + Postgres
+name: Flowbuild API + Redis + Postgres + Timer-Worker + WEM
 description: Base template with the flowbuild API server conected to a Postgres database.
 tags: 
   - nodejs

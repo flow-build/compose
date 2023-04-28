@@ -81,7 +81,7 @@ components:
         gitBranch: master
         gitApplicationPath: /
         dockerCompose:
-            image: 'flowbuild/server:2.22.4'
+            image: 'flowbuild/server:2.23.1'
             deploy:
               resources:
                 limits:
